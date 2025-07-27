@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Make it Meme TR</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="welcome-screen">
+    <h1>Make it Meme TR</h1>
+    <input type="text" id="username" placeholder="Adını yaz" />
+    <button onclick="joinGame()">Oyuna Katıl</button>
+  </div>
+
+  <div id="game-screen" style="display:none;">
+    <div id="meme-container">
+      <img id="meme-image" src="" alt="Meme" />
+      <textarea id="meme-text" placeholder="Yazını buraya yaz..."></textarea>
+      <button onclick="submitMeme()">Gönder</button>
+    </div>
+  </div>
+
+  <div id="voting-screen" style="display:none;">
+    <h2>Meme Oylama</h2>
+    <img id="voting-image" src="" alt="Oy Verilecek Meme" />
+    <p id="voting-text"></p>
+    <button onclick="vote('up')">👍 Upvote</button>
+    <button onclick="vote('meh')">😐 Meh</button>
+    <button onclick="vote('down')">👎 Downvote</button>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
