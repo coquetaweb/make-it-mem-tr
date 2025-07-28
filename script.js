@@ -1,72 +1,81 @@
-let username = "";
+let memes = ["meme1.jpg", "meme2.jpg", "meme3.jpg"]; // Fotoğraf dosya adların
 let currentMemeIndex = 0;
-let memes = [
-  "meme1.jpg",
-  "meme2.jpg",
-  "meme3.jpg"
-];
+let allCaptions = [];
+let allVotes = [];
+let playersFinished = 0;
 
-function joinGame() {
-  username = document.getElementById("username").value.trim();
-  if (!username) return alert("Adını yazman gerekiyor!");
-  
-  document.getElementById("welcome-screen").style.display = "none";
-  document.getElementById("game-screen").style.display = "block";
-
-  showMeme();
-}
+const totalPlayers = 3; // Geçici sabit (Firebase ile gerçek oyuncu sayısı alınır)
 
 function showMeme() {
-  const memeImage = document.getElementById("meme-image");
-  memeImage.src = memes[currentMemeIndex];
-  document.getElementById("meme-text").value = "";
+  document.getElementById("game-screen").style.display = "block";
+  document.getElementById("voting-screen").style.display = "none";
+  document.getElementById("meme-image").src = "memes/" + memes[currentMemeIndex];
+  document.getElementById("caption").value = "";
+  playersFinished = 0;
+  allCaptions = [];
+  allVotes = [];
 }
 
-function submitMeme() {
-  const text = document.getElementById("meme-text").value.trim();
-  if (!text) return alert("Bir şey yazmalısın!");
+function submitCaption() {
+  const caption = document.getElementById("caption").value.trim();
+  if (caption === "") return alert("Boş yazı gönderemezsin!");
 
-  const memeData = {
-    user: username,
-    text: text,
-    meme: memes[currentMemeIndex],
-    votes: { up: 0, meh: 0, down: 0 }
-  };
+  allCaptions.push({ meme: memes[currentMemeIndex], caption });
+  playersFinished++;
 
-  const key = db.ref("memes").push().key;
-  db.ref("memes/" + key).set(memeData);
-
-  document.getElementById("game-screen").style.display = "none";
-  waitForVoting(key);
+  if (playersFinished >= totalPlayers) {
+    startVotingPhase();
+  } else {
+    document.getElementById("game-screen").style.display = "none";
+    document.getElementById("waiting-message").style.display = "block";
+  }
 }
 
-function waitForVoting(submittedKey) {
-  db.ref("memes").once("value", (snapshot) => {
-    const memesData = snapshot.val();
-    const entries = Object.entries(memesData || {});
-    
-    let votingQueue = entries.filter(([key, val]) => key !== submittedKey);
+function startVotingPhase() {
+  document.getElementById("waiting-message").style.display = "none";
+  document.getElementById("voting-screen").style.display = "block";
 
-    if (votingQueue.length === 0) {
-      alert("Oylanacak başka meme henüz yok. Lütfen bekle...");
-      return;
-    }
+  showNextCaption(0);
+}
 
-    let i = 0;
-    document.getElementById("voting-screen").style.display = "block";
+let currentCaptionIndex = 0;
 
-    function showNextVote() {
-      if (i >= votingQueue.length) {
-        alert("Oylama bitti. 10 saniye sonra yeni tur başlıyor!");
-document.getElementById("voting-screen").style.display = "none";
-
-setTimeout(() => {
-  currentMemeIndex++;
-
-  if (currentMemeIndex >= memes.length) {
-    currentMemeIndex = 0;
+function showNextCaption(index) {
+  if (index >= allCaptions.length) {
+    endVoting();
+    return;
   }
 
-  document.getElementById("game-screen").style.display = "block";
+  const item = allCaptions[index];
+  document.getElementById("voting-meme").src = "memes/" + item.meme;
+  document.getElementById("voting-caption").innerText = item.caption;
+
+  currentCaptionIndex = index;
+}
+
+function vote(type) {
+  allVotes.push({ index: currentCaptionIndex, vote: type });
+  showNextCaption(currentCaptionIndex + 1);
+}
+
+function endVoting() {
+  document.getElementById("voting-screen").style.display = "none";
+
+  // Oyun 10 saniye sonra otomatik yeniden başlasın
+  alert("Oylama bitti. 10 saniye sonra yeni tur başlıyor!");
+
+  setTimeout(() => {
+    currentMemeIndex++;
+
+    if (currentMemeIndex >= memes.length) {
+      currentMemeIndex = 0; // Baştan başla
+    }
+
+    showMeme();
+  }, 10000);
+}
+
+// İlk oyunu başlat
+window.onload = () => {
   showMeme();
-}, 10000);
+};
