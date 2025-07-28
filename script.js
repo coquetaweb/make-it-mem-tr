@@ -57,20 +57,16 @@ function waitForVoting(submittedKey) {
 
     function showNextVote() {
       if (i >= votingQueue.length) {
-        alert("Oylama bitti. 10 saniye sonra yeni tur başlıyor ! ");
-        document.getElementById("voting-screen").style.display = "none";
-        return;
-      }
+        alert("Oylama bitti. 10 saniye sonra yeni tur başlıyor!");
+document.getElementById("voting-screen").style.display = "none";
 
-      // 10 saniye sonra yeni meme ile oyun başlasın
 setTimeout(() => {
   currentMemeIndex++;
 
-  // Eğer meme bitmişse başa dön
   if (currentMemeIndex >= memes.length) {
     currentMemeIndex = 0;
   }
 
   document.getElementById("game-screen").style.display = "block";
   showMeme();
-}, 10000); // 10000 ms = 10 saniye
+}, 10000);
