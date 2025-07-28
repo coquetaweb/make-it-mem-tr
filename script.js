@@ -57,24 +57,20 @@ function waitForVoting(submittedKey) {
 
     function showNextVote() {
       if (i >= votingQueue.length) {
-        alert("Oylama bitti. Teşekkürler!");
+        alert("Oylama bitti. 10 saniye sonra yeni tur başlıyor ! ");
         document.getElementById("voting-screen").style.display = "none";
         return;
       }
 
-      const [key, meme] = votingQueue[i];
-      document.getElementById("voting-image").src = meme.meme;
-      document.getElementById("voting-text").innerText = meme.text;
+      // 10 saniye sonra yeni meme ile oyun başlasın
+setTimeout(() => {
+  currentMemeIndex++;
 
-      document.querySelectorAll("#voting-screen button").forEach(btn => {
-        btn.onclick = () => {
-          db.ref("memes/" + key + "/votes/" + btn.innerText.toLowerCase()).transaction(n => (n || 0) + 1);
-          i++;
-          showNextVote();
-        };
-      });
-    }
+  // Eğer meme bitmişse başa dön
+  if (currentMemeIndex >= memes.length) {
+    currentMemeIndex = 0;
+  }
 
-    showNextVote();
-  });
-}
+  document.getElementById("game-screen").style.display = "block";
+  showMeme();
+}, 10000); // 10000 ms = 10 saniye
